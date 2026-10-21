@@ -88,10 +88,9 @@ aigc-shijing:*
 | Framework preset | None / Vite |
 | Build command | `npm run build:cloudflare` |
 | Build output directory | `dist/cloudflare` |
-| Node.js version | `22.12.0` 或更高 |
-| Environment variables | 无 |
+| Environment variables | `NODE_VERSION=22.12.0` |
 
-当前项目不需要 API 密钥、数据库或环境变量。收藏与作品数据保存在访问者浏览器的 `localStorage`。
+当前项目不需要 API 密钥、数据库或运行时环境变量。`NODE_VERSION` 仅用于固定 Cloudflare Pages 的构建环境。收藏与作品数据保存在访问者浏览器的 `localStorage`。
 
 ## AI 生成状态
 
