@@ -7,6 +7,8 @@ import Brand from '@/components/Brand';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { useStoreRevision } from '@/hooks/use-store-revision';
+import { getAuthSession } from '@/lib/store';
 
 const NAV_ITEMS = [
   { path: '/', label: '首页' },
@@ -18,6 +20,8 @@ const NAV_ITEMS = [
 export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  useStoreRevision();
+  const session = getAuthSession();
   const [scrolled, setScrolled] = useState(false);
   const [query, setQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -112,22 +116,38 @@ export default function Navbar() {
             <Search className="size-5" />
           </Button>
 
-          <button
-            type="button"
-            onClick={() => navigate('/profile')}
-            className={cn(
-              'rounded-full transition-opacity hover:opacity-80',
-              transparent && 'ring-1 ring-moon/30',
-            )}
-            aria-label="个人中心"
-          >
-            <Avatar className="size-9">
-              <AvatarImage src={img('avatar.jpg')} alt="用户头像" className="size-full object-cover" />
-              <AvatarFallback className={cn('text-xs', transparent ? 'bg-moon/15 text-moon' : 'bg-primary/10 text-primary')}>
-                山
-              </AvatarFallback>
-            </Avatar>
-          </button>
+          {session ? (
+            <button
+              type="button"
+              onClick={() => navigate('/profile')}
+              className={cn(
+                'rounded-full transition-opacity hover:opacity-80',
+                transparent && 'ring-1 ring-moon/30',
+              )}
+              aria-label="个人中心"
+            >
+              <Avatar className="size-9">
+                <AvatarImage src={img('avatar.jpg')} alt="用户头像" className="size-full object-cover" />
+                <AvatarFallback className={cn('text-xs', transparent ? 'bg-moon/15 text-moon' : 'bg-primary/10 text-primary')}>
+                  山
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className={cn(
+                'min-w-14 rounded-full px-3',
+                transparent
+                  ? 'text-moon hover:bg-moon/15 hover:text-moon'
+                  : 'text-foreground hover:bg-primary/10 hover:text-primary',
+              )}
+            >
+              登录
+            </Button>
+          )}
 
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
@@ -185,8 +205,12 @@ export default function Navbar() {
               </nav>
               <div className="absolute bottom-4 left-6 right-6">
                 <SheetClose asChild>
-                  <Button variant="outline" className="w-full" onClick={() => navigate('/profile')}>
-                    个人中心
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate(session ? '/profile' : '/login')}
+                  >
+                    {session ? '个人中心' : '登录'}
                   </Button>
                 </SheetClose>
               </div>

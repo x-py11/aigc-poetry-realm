@@ -22,6 +22,12 @@ export interface IMyWork {
   atmosphere?: string;
 }
 
+export interface IUserSession {
+  account: string;
+  displayName: string;
+  loggedInAt: string;
+}
+
 const NS = 'aigc-shijing';
 let revision = 0;
 const listeners = new Set<() => void>();
@@ -61,6 +67,7 @@ const K_FAVORITES = 'favorites';
 const K_LIKES = 'likes';
 const K_MY_WORKS = 'my-works';
 const K_MODAL = 'modal-shown';
+const K_AUTH_SESSION = 'auth-session';
 
 export const getFavorites = () => store.get<string[]>(K_FAVORITES, []);
 export const setFavorites = (ids: string[]) => store.set(K_FAVORITES, ids);
@@ -98,6 +105,10 @@ export const updateWork = (id: string, patch: Partial<IMyWork>) => {
 export const getModalShown = () => store.get<boolean>(K_MODAL, false);
 export const setModalShown = (v: boolean) => store.set(K_MODAL, v);
 
+export const getAuthSession = () => store.get<IUserSession | null>(K_AUTH_SESSION, null);
+export const setAuthSession = (session: IUserSession) => store.set(K_AUTH_SESSION, session);
+export const clearAuthSession = () => store.set(K_AUTH_SESSION, null);
+
 // 生成作品 ID 与时间（放在非组件模块，供事件处理器调用）
 let workSeq = 0;
 export const nextWorkId = () => `my-${Date.now()}-${(workSeq += 1)}`;
@@ -105,7 +116,9 @@ export const nowIso = () => new Date().toISOString();
 
 export const resetAll = () => {
   try {
-    [K_FAVORITES, K_LIKES, K_MY_WORKS, K_MODAL].forEach((k) => localStorage.removeItem(`${NS}:${k}`));
+    [K_FAVORITES, K_LIKES, K_MY_WORKS, K_MODAL, K_AUTH_SESSION].forEach((k) =>
+      localStorage.removeItem(`${NS}:${k}`),
+    );
     notify();
   } catch {
     /* 隐私模式静默降级 */

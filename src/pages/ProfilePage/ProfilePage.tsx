@@ -1,8 +1,16 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Sparkles, RotateCcw, Send, Pencil, Image as ImageIcon } from 'lucide-react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Heart, Sparkles, RotateCcw, Send, Pencil, Image as ImageIcon, LogOut } from 'lucide-react';
 import { POEMS } from '@/data/poems';
 import { getStyleName } from '@/data/works';
-import { getMyWorks, updateWork, toggleFavorite, resetAll, getLikes } from '@/lib/store';
+import {
+  getMyWorks,
+  updateWork,
+  toggleFavorite,
+  resetAll,
+  getLikes,
+  getAuthSession,
+  clearAuthSession,
+} from '@/lib/store';
 import { usePersistedState } from '@/hooks/use-persisted-state';
 import { useStoreRevision } from '@/hooks/use-store-revision';
 import { img } from '@/lib/base';
@@ -17,15 +25,24 @@ import { toast } from 'sonner';
 export default function ProfilePage() {
   const navigate = useNavigate();
   useStoreRevision();
+  const session = getAuthSession();
   const [favorites, setFavorites] = usePersistedState<string[]>('favorites', []);
   const myWorks = getMyWorks();
   const favoritePoems = POEMS.filter((p) => favorites.includes(p.id));
   const likesCount = getLikes().length;
 
+  if (!session) return <Navigate to="/login" replace />;
+
   const handleResetGuide = () => {
     resetAll();
     toast.success('已重置本地演示数据，可重新体验首次意境引导');
     navigate('/');
+  };
+
+  const handleLogout = () => {
+    clearAuthSession();
+    toast.success('已退出登录');
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -38,23 +55,30 @@ export default function ProfilePage() {
             <AvatarFallback className="bg-primary/10 font-serif text-2xl text-primary">山</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-xl font-semibold text-foreground">25软件1hh</h1>
+            <h1 className="font-serif text-xl font-semibold text-foreground">{session.displayName}</h1>
+            <p className="mt-1 text-xs text-muted-foreground">账号：{session.account}</p>
             <p className="mt-1 text-sm text-muted-foreground">以诗为境，以 AI 绘意。</p>
             <p className="mt-1 text-xs text-muted-foreground/70">示例用户 · 原型演示，数据保存在当前浏览器本地</p>
           </div>
-          <div className="flex gap-8 text-center">
-            <div>
-              <p className="font-serif text-2xl font-semibold text-primary">{myWorks.length}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">我的作品</p>
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-6">
+            <div className="flex gap-8 text-center">
+              <div>
+                <p className="font-serif text-2xl font-semibold text-primary">{myWorks.length}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">我的作品</p>
+              </div>
+              <div>
+                <p className="font-serif text-2xl font-semibold text-primary">{favorites.length}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">收藏诗词</p>
+              </div>
+              <div>
+                <p className="font-serif text-2xl font-semibold text-primary">{likesCount}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">点赞作品</p>
+              </div>
             </div>
-            <div>
-              <p className="font-serif text-2xl font-semibold text-primary">{favorites.length}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">收藏诗词</p>
-            </div>
-            <div>
-              <p className="font-serif text-2xl font-semibold text-primary">{likesCount}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">点赞作品</p>
-            </div>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={handleLogout}>
+              <LogOut className="size-3.5" aria-hidden="true" />
+              退出登录
+            </Button>
           </div>
         </div>
 

@@ -8,6 +8,7 @@ const PoemPage = lazy(() => import('@/pages/PoemPage/PoemPage'));
 const CreatePage = lazy(() => import('@/pages/CreatePage/CreatePage'));
 const PreviewPage = lazy(() => import('@/pages/PreviewPage/PreviewPage'));
 const CommunityPage = lazy(() => import('@/pages/CommunityPage/CommunityPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage/LoginPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage/ProfilePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage/NotFoundPage'));
 
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="create" element={<PageSuspense><CreatePage /></PageSuspense>} />
         <Route path="preview/:id" element={<PageSuspense><PreviewPage /></PageSuspense>} />
         <Route path="community" element={<PageSuspense><CommunityPage /></PageSuspense>} />
+        <Route path="login" element={<PageSuspense><LoginPage /></PageSuspense>} />
         <Route path="profile" element={<PageSuspense><ProfilePage /></PageSuspense>} />
       </Route>
       <Route path="*" element={<PageSuspense><NotFoundPage /></PageSuspense>} />
